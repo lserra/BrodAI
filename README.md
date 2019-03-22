@@ -6,7 +6,7 @@ There are around 1000's tables in AWS Athena where the columns are email, value,
 
 Each one of those tables represents some sort of data point against that email.
 
-The goal is to put all thos columns into a single table. Where the columns are email (unique), first_name, last_name, gender, etc.
+The goal is to put all those columns into a single table. Where the columns are email (unique), first_name, last_name, gender, etc.
 
 And where each value is the accepted, single 'answer' for that email's various data points.
 
