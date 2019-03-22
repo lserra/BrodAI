@@ -19,7 +19,7 @@ Here are my suggestions to deal with this situation:
 
 ## DAS (Design Architecture Solution)
 
-![DAS](https://github.com/lserra/BordAI/blob/master/DAS.png?raw=true "DAS")
+![DAS](https://github.com/lserra/BrodAI/blob/master/DAS.png?raw=true)
 
 In general the solution will works this way:
 
