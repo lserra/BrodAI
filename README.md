@@ -81,7 +81,7 @@ But if necessary we can contact AWS Support to request a limit increase.
 
 Currently, I don't have permission to create jobs on AWS Glue.
 
-![AwsGlueAccessDenied](/home/lserra/Downloads/Upwork/AwsGlueAccessDenied.png)
+![AwsGlueAccessDenied](https://github.com/lserra/BrodAI/blob/master/AwsGlueAccessDenied.png?raw=true)
 
 ## Requirements
 
