@@ -30,37 +30,70 @@ job.init(args['JOB_NAME'])
 # Loading a table from Glue data catalog
 # email, gender, ethnic, age, income
 df_email = glueContext.create_dynamic_frame.from_catalog(
-    database="parquet", table_name="broker_crawler_broker"
+    database="parquet",
+    table_name="broker_crawler_broker"
     ).toDF()
 
-faturamento = glueContext.create_dynamic_frame
-.from_catalog(
+df_gender = glueContext.create_dynamic_frame.from_catalog(
     database="parquet",
-    table_name="faturamento_crawler_faturamento")
-.toDF()
+    table_name="broker_crawler_broker"
+    ).toDF()
 
-# Lowering the case for columns (to avoid hive problems)
-for col in df.columns:
-    df = df.withColumnRenamed(col, col.lower())
+df_ethnic = glueContext.create_dynamic_frame.from_catalog(
+    database="parquet",
+    table_name="broker_crawler_broker"
+    ).toDF()
 
-# Renaming join id
-df = df.withColumnRenamed(
-    'lineitem_usageaccountid', 'linked_account_id'
-    )
+df_age = glueContext.create_dynamic_frame.from_catalog(
+    database="parquet",
+    table_name="broker_crawler_broker"
+    ).toDF()
 
-# Loading DBR csv to get account_name and join to CUR dataframe
-# orgs = spark.read.format("com.databricks.spark.csv")
-# .option("header", "true")
-# .option("inferSchema", "true")
-# .option("delimiter", ';')
-# .load(
-#     's3://gbassan-athena/totvs/in/aws_orgs/poc_aws_billing_aws.csv'
-#     )
+df_income = glueContext.create_dynamic_frame.from_catalog(
+    database="parquet",
+    table_name="broker_crawler_broker"
+    ).toDF()
 
-# Selecting distinct values
-orgs_filtered = orgs.select(
-    ['linked_account_id', 'linked_account_name']
-    ).distinct()
+# For each dataframe
+# Lowering the case for columns
+# To avoid Hive issues
+for col in df_email.columns:
+    df_email = df_email.withColumnRenamed(col, col.lower())
+
+for col in df_age.columns:
+    df_age = df_age.withColumnRenamed(col, col.lower())
+
+for col in df_ethnic.columns:
+    df_ethnic = df_ethnic.withColumnRenamed(col, col.lower())
+
+for col in df_income.columns:
+    df_income = df_income.withColumnRenamed(col, col.lower())
+
+for col in df_gender.columns:
+    df_gender = df_gender.withColumnRenamed(col, col.lower())
+
+# Renaming column join id
+# df = df.withColumnRenamed('lineitem_usageaccountid', 'linked_account_id')
+
+# For each dataframe
+# Selecting distinct values [email]
+df_email_unique = df_email.select(['email']).distinct()
+df_age_unique = df_age.select(['email']).distinct()
+df_ethnic_unique = df_ethnic.select(['email']).distinct()
+df_income_unique = df_income.select(['email']).distinct()
+df_gender_unique = df_gender.select(['email']).distinct()
+
+# Joining all emails only one dataframe
+df_email_union = df_email_unique.union(
+    df_age_unique.union(
+        df_ethnic_unique.union(
+            df_income_unique.union(
+                df_gender_unique
+            )
+        )))
+
+# Selecting distinct values [email]
+df_email_union_unique = df_email_union.select(['email']).distinct()
 
 # Selecting values from right table
 billing_joined = df.join(
@@ -69,11 +102,6 @@ billing_joined = df.join(
 
 # Selecting distinct values
 broker_filtered = broker.select(['ccode', 'tcode']).distinct()
-
-# Renaming join id
-billing_joined = billing_joined.withColumnRenamed(
-    'linked_account_name', 'ccode'
-    )
 
 # Using left outer join to populate only billing table
 billing_joined = billing_joined.
@@ -96,17 +124,6 @@ billing_joined = billing_joined.join(
 df_dyf = DynamicFrame.fromDF(
     billing_joined, glueContext, "dynamic"
     )
-
-# Partitioning data
-# now = datetime.datetime.now()
-
-# print now.year, now.month, now.day, now.hour, now.minute, now.second
-# year = str(now.year)
-# month = str(now.month)
-# if(now.day < 10):
-#     day = "0" + str(now.day)
-# else:
-#     day = str(now.day)
 
 # Writing parquet format to load on Data Catalog
 glueContext.write_dynamic_frame.from_options(
