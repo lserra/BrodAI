@@ -104,7 +104,7 @@ billing_formated = billing_formated.withColumnRenamed(
     'lineitem_usageaccountid', 'linked_account_id'
     )
 
-# Load DBR csv to get account_name and join to CUR dataframe    
+# Load DBR csv to get account_name and join to CUR dataframe
 orgs = spark.read.format(
    "com.databricks.spark.csv").option(
    "header", "true").option(
@@ -146,7 +146,7 @@ billing_joined = billing_joined.join(broker_filtered, ["ccode"], "left_outer")
 billing_joined = billing_joined.drop('linked_account_id')
 
 # getting columns from faturamento data catalog
-# load DBR csv to get account_name and join to CUR dataframe    
+# load DBR csv to get account_name and join to CUR dataframe
 faturamento = glueContext.create_dynamic_frame
 .from_catalog(
     database="parquet",
