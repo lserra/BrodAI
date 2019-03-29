@@ -2,6 +2,7 @@
 # BrodAI
 # Created by: Laercio Serra (laercio.serra@gmail.com)
 # Joining fields from many tables into only one table
+# Fields: email, gender, ethnic, age, income
 # ==============================================================================
 import datetime
 import sys

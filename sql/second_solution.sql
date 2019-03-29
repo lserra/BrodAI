@@ -1,9 +1,4 @@
 /*Testing the second solution*/
--- (email)
--- gender
--- race/ethnicity => Don't exist the table race
--- age
--- income
 SELECT DISTINCT
     -- a.sourceid as SOURCEID,
     a.email as email,
