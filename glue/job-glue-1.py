@@ -72,9 +72,6 @@ for col in df_income.columns:
 for col in df_gender.columns:
     df_gender = df_gender.withColumnRenamed(col, col.lower())
 
-# Renaming column join id
-# df = df.withColumnRenamed('lineitem_usageaccountid', 'linked_account_id')
-
 # For each dataframe
 # Selecting distinct values [email]
 df_email_unique = df_email.select(['email']).distinct()
@@ -95,34 +92,53 @@ df_email_union = df_email_unique.union(
 # Selecting distinct values [email]
 df_email_union_unique = df_email_union.select(['email']).distinct()
 
-# Selecting values from right table
-billing_joined = df.join(
-    orgs_filtered, ["linked_account_id"], "left_outer"
+# Joining values: email and age
+df_joined_age = df_email_union_unique.join(
+    df_age.select(['email', 'entry']), ['email'], 'left_outer'
     )
 
-# Selecting distinct values
-broker_filtered = broker.select(['ccode', 'tcode']).distinct()
+# Dropping columns duplicated: email
+df_joined_age.drop('email')
 
-# Using left outer join to populate only billing table
-billing_joined = billing_joined.
-join(broker_filtered, ["ccode"], "left_outer")
+# Renaming column from entry to age
+df_joined_age.withColumnRenamed('entry', 'age')
 
-# Dropping AWS account id
-billing_joined = billing_joined.drop('linked_account_id')
-
-# Selecting distinct values from right table
-faturamento_filtered = faturamento.select(
-    ['tcode', 'nomedocliente', 'macrosegmentosrie', 'estadodocliente']
-    ).distinct()
-
-# Using left outer join to populate only billing table
-billing_joined = billing_joined.join(
-    faturamento_filtered, ["tcode"], "left_outer"
+# Joining values: email, age, and ethnic
+df_joined_ethnic = df_joined_age.join(
+    df_ethnic.select(['email', 'entry']), ['email'], 'left_outer'
     )
+
+# Dropping columns duplicated: email
+df_joined_ethnic.drop('email')
+
+# Renaming column from entry to ethnic
+df_joined_ethnic.withColumnRenamed('entry', 'ethnic')
+
+# Joining values: email, age, ethnic and income
+df_joined_income = df_joined_ethnic.join(
+    df_income.select(['email', 'entry']), ['email'], 'left_outer'
+    )
+
+# Dropping columns duplicated: email
+df_joined_income.drop('email')
+
+# Renaming column from entry to ethnic
+df_joined_income.withColumnRenamed('entry', 'income')
+
+# Joining values: email, age, ethnic, income and gender
+df_joined_gender = df_joined_income.join(
+    df_gender.select(['email', 'entry']), ['email'], 'left_outer'
+    )
+
+# Dropping columns duplicated: email
+df_joined_gender.drop('email')
+
+# Renaming column from entry to ethnic
+df_joined_gender.withColumnRenamed('entry', 'gender')
 
 # Converting to a dynamic dataframe
 df_dyf = DynamicFrame.fromDF(
-    billing_joined, glueContext, "dynamic"
+    df_joined_gender, glueContext, "dynamic"
     )
 
 # Writing parquet format to load on Data Catalog
