@@ -90,54 +90,63 @@ df_email_union = df_email_unique.union(
         )))
 
 # Selecting distinct values [email]
-df_email_union_unique = df_email_union.select(['email']).distinct()
+df_email_union_unique = df_email_union.select('email').distinct()
 
 # Joining values: email and age
 df_joined_age = df_email_union_unique.join(
-    df_age, ['email'], 'left_outer'
+    df_age, 'email', 'left_outer'
     ).select(
-        df_email_union_unique.email,
-        df_age.entry
+        df_email_union_unique['email'],
+        df_age['entry'].alias('age')
         ).collect()
 
 # Dropping columns duplicated: email
-df_joined_age.drop('email')
+# df_joined_age.drop('email')
 
 # Renaming column from entry to age
-df_joined_age.withColumnRenamed('entry', 'age')
+# df_joined_age.withColumnRenamed('entry', 'age')
 
 # Joining values: email, age, and ethnic
 df_joined_ethnic = df_joined_age.join(
-    df_ethnic.select(['email', 'entry']), ['email'], 'left_outer'
-    )
+    df_ethnic, 'email', 'left_outer'
+    ).select(
+        df_joined_age['email', 'age'],
+        df_ethnic['entry'].alias('ethnic')
+        ).collect()
 
 # Dropping columns duplicated: email
-df_joined_ethnic.drop('email')
+# df_joined_ethnic.drop('email')
 
 # Renaming column from entry to ethnic
-df_joined_ethnic.withColumnRenamed('entry', 'ethnic')
+# df_joined_ethnic.withColumnRenamed('entry', 'ethnic')
 
 # Joining values: email, age, ethnic and income
 df_joined_income = df_joined_ethnic.join(
-    df_income.select(['email', 'entry']), ['email'], 'left_outer'
-    )
+    df_income, ['email'], 'left_outer'
+    ).select(
+        df_joined_ethnic['email', 'age', 'ethnic'],
+        df_income['entry'].alias('income')
+        ).collect()
 
 # Dropping columns duplicated: email
-df_joined_income.drop('email')
+# df_joined_income.drop('email')
 
 # Renaming column from entry to ethnic
-df_joined_income.withColumnRenamed('entry', 'income')
+# df_joined_income.withColumnRenamed('entry', 'income')
 
 # Joining values: email, age, ethnic, income and gender
 df_joined_gender = df_joined_income.join(
-    df_gender.select(['email', 'entry']), ['email'], 'left_outer'
-    )
+    df_gender, ['email'], 'left_outer'
+    ).select(
+        df_joined_income['email', 'age', 'ethnic', 'income'],
+        df_gender['entry'].alias('gender')
+        ).collect()
 
 # Dropping columns duplicated: email
-df_joined_gender.drop('email')
+# df_joined_gender.drop('email')
 
 # Renaming column from entry to ethnic
-df_joined_gender.withColumnRenamed('entry', 'gender')
+# df_joined_gender.withColumnRenamed('entry', 'gender')
 
 # Converting to a dynamic dataframe
 df_dyf = DynamicFrame.fromDF(
