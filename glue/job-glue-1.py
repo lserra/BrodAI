@@ -29,37 +29,36 @@ job.init(args['JOB_NAME'])
 
 # Loading a table from Glue data catalog
 # email, gender, ethnic, age, income
-df_email = glueContext.create_dynamic_frame.from_catalog(
-    database="parquet",
-    table_name="broker_crawler_broker"
-    ).toDF()
+# df_email = glueContext.create_dynamic_frame.from_catalog(
+#     database="mm_redirect_logs",
+#     table_name="broker_crawler_broker"
+#     ).toDF()
 
 df_gender = glueContext.create_dynamic_frame.from_catalog(
-    database="parquet",
-    table_name="broker_crawler_broker"
+    database="mm_redirect_logs",
+    table_name="mdb_field_gender"
     ).toDF()
 
 df_ethnic = glueContext.create_dynamic_frame.from_catalog(
-    database="parquet",
-    table_name="broker_crawler_broker"
+    database="mm_redirect_logs",
+    table_name="mdb_field_ethnicity"
     ).toDF()
 
 df_age = glueContext.create_dynamic_frame.from_catalog(
-    database="parquet",
-    table_name="broker_crawler_broker"
+    database="mm_redirect_logs",
+    table_name="mdb_field_age"
     ).toDF()
 
 df_income = glueContext.create_dynamic_frame.from_catalog(
-    database="parquet",
-    table_name="broker_crawler_broker"
+    database="mm_redirect_logs",
+    table_name="mdb_field_income"
     ).toDF()
 
 # For each dataframe
 # Lowering the case for columns
 # To avoid Hive issues
-for col in df_email.columns:
-    df_email = df_email.withColumnRenamed(col, col.lower())
-
+# for col in df_email.columns:
+#     df_email = df_email.withColumnRenamed(col, col.lower())
 for col in df_age.columns:
     df_age = df_age.withColumnRenamed(col, col.lower())
 
@@ -74,20 +73,18 @@ for col in df_gender.columns:
 
 # For each dataframe
 # Selecting distinct values [email]
-df_email_unique = df_email.select('email').distinct()
+# df_email_unique = df_email.select('email').distinct()
 df_age_unique = df_age.select('email').distinct()
 df_ethnic_unique = df_ethnic.select('email').distinct()
 df_income_unique = df_income.select('email').distinct()
 df_gender_unique = df_gender.select('email').distinct()
 
 # Joining all emails only one dataframe
-df_email_union = df_email_unique.union(
-    df_age_unique.union(
+df_email_union = df_age_unique.union(
         df_ethnic_unique.union(
             df_income_unique.union(
                 df_gender_unique
-            )
-        )))
+            )))
 
 # Selecting distinct values [email]
 df_email_union_unique = df_email_union.select('email').distinct()
