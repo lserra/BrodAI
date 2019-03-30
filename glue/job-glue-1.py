@@ -3,6 +3,7 @@
 # Created by: Laercio Serra (laercio.serra@gmail.com)
 # Joining fields from many tables into only one table
 # Fields: email, gender, ethnic, age, income
+# Special Parameter: --enable-glue-datacatalog
 # ==============================================================================
 import sys
 
@@ -33,10 +34,9 @@ job.init(args['JOB_NAME'])
 #     database="mm_redirect_logs",
 #     table_name="broker_crawler_broker"
 #     ).toDF()
-
-df_gender = glueContext.create_dynamic_frame.from_catalog(
+df_age = glueContext.create_dynamic_frame.from_catalog(
     database="mm_redirect_logs",
-    table_name="mdb_field_gender"
+    table_name="mdb_field_age"
     ).toDF()
 
 df_ethnic = glueContext.create_dynamic_frame.from_catalog(
@@ -44,14 +44,14 @@ df_ethnic = glueContext.create_dynamic_frame.from_catalog(
     table_name="mdb_field_ethnicity"
     ).toDF()
 
-df_age = glueContext.create_dynamic_frame.from_catalog(
-    database="mm_redirect_logs",
-    table_name="mdb_field_age"
-    ).toDF()
-
 df_income = glueContext.create_dynamic_frame.from_catalog(
     database="mm_redirect_logs",
     table_name="mdb_field_income"
+    ).toDF()
+
+df_gender = glueContext.create_dynamic_frame.from_catalog(
+    database="mm_redirect_logs",
+    table_name="mdb_field_gender"
     ).toDF()
 
 # For each dataframe
@@ -160,3 +160,5 @@ glueContext.write_dynamic_frame.from_options(
             },
         format="parquet"
         )
+
+job.commit()
