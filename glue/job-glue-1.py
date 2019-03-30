@@ -158,8 +158,7 @@ glueContext.write_dynamic_frame.from_options(
         frame=df_dyf,
         connection_type="s3",
         connection_options={
-            "path": "s3://gbassan-athena/totvs/out/aws_billing/year=" +
-            year + "/month=05/day=" + day + "/cloud=aws"
+            "path": "s3://aws-glue-temporary-925821979506-us-east-1/mm_data_lake/results/"
             },
         format="parquet"
         )
