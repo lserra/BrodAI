@@ -155,7 +155,8 @@ glueContext.write_dynamic_frame.from_options(
         frame=df_dyf,
         connection_type="s3",
         connection_options={
-            "path": "s3://aws-glue-temporary-925821979506-us-east-1/mm_data_lake/results/"
+            "path": "s3://aws-glue-temporary-925821979506-us-east-1/\
+                mm_data_lake/results/"
             },
         format="parquet"
         )
