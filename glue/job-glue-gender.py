@@ -41,12 +41,11 @@ for col in df_gender.columns:
 # Dropping column
 df_gender.drop('sourceid')
 
-# For each dataframe
-# Selecting distinct values [email]
+# Selecting distinct values
 df_gender_unique = df_gender.select('email', 'entry').distinct()
 
-# Renaming column from entry to age
-df_gender_unique.withColumnRenamed('entry', 'age')
+# Renaming column from entry to gender
+df_gender_unique.withColumnRenamed('entry', 'gender')
 
 # Converting to a dynamic dataframe
 df_dyf = DynamicFrame.fromDF(
@@ -58,7 +57,7 @@ glueContext.write_dynamic_frame.from_options(
         frame=df_dyf,
         connection_type="s3",
         connection_options={
-            "path": "s3://aws-glue-temporary-925821979506-us-east-1/mm_data_lake/results/age/"
+            "path": "s3://aws-glue-temporary-925821979506-us-east-1/mm_data_lake/results/gender/"
             },
         format="parquet"
         )

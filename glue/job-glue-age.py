@@ -41,8 +41,7 @@ for col in df_age.columns:
 # Dropping column
 df_age.drop('sourceid')
 
-# For each dataframe
-# Selecting distinct values [email]
+# Selecting distinct values
 df_age_unique = df_age.select('email', 'entry').distinct()
 
 # Renaming column from entry to age
