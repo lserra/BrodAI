@@ -11,46 +11,78 @@ from awsglue.dynamicframe import DynamicFrame
 from awsglue.job import Job
 from awsglue.transforms import *
 from awsglue.utils import getResolvedOptions
+
 from pyspark.context import SparkContext
-from pyspark.sql import SparkSession, SQLContext
-from pyspark.sql.functions import col, regexp_extract, regexp_replace, udf
-from pyspark.sql.types import StringType
+from pyspark.sql import SparkSession
 
 # Params to be trigged by lambda function
 args = getResolvedOptions(sys.argv, ['JOB_NAME'])
 
 # Create a Glue context
-glueContext = GlueContext(SparkContext.getOrCreate())
+sc = SparkContext()
+glueContext = GlueContext(sc)
 spark = glueContext.spark_session
 
 # Initiating job and args
 job = Job(glueContext)
-job.init(args['JOB_NAME'])
+job.init(args['JOB_NAME'], args)
 
 # Loading a table from Glue data catalog
-# email, age
-df_gender = glueContext.create_dynamic_frame.from_catalog(
+# email, gender
+datasource0 = glueContext.create_dynamic_frame.from_catalog(
     database="mm_redirect_logs",
-    table_name="new_gender"
-    ).toDF()
+    table_name="new_gender",
+    transformation_ctx="datasource0")
 
-# Lowering the case for columns to avoid Hive issues
-for col in df_gender.columns:
-    df_gender = df_gender.withColumnRenamed(col, col.lower()).collect()
+applymapping1 = ApplyMapping.apply(
+    frame=datasource0,
+    mappings=[
+        ("email", "string", "email", "string"),
+        ("entry", "string", "entry", "string")
+        ],
+    transformation_ctx="applymapping1")
 
-# Dropping column
-df_gender.drop('sourceid')
+selectfields2 = SelectFields.apply(
+    frame=applymapping1,
+    paths=["email", "entry"],
+    transformation_ctx="selectfields2"
+    )
 
-# Selecting distinct values
-df_gender_unique = df_gender.select('email', 'entry').distinct().collect()
+resolvechoice3 = ResolveChoice.apply(
+    frame=selectfields2,
+    choice="MATCH_CATALOG",
+    database="mm_data_lake",
+    table_name="mdb_field_new_gender",
+    transformation_ctx="resolvechoice3"
+    )
 
-# Renaming column from entry to gender
-df_gender_unique.withColumnRenamed('entry', 'gender').collect()
+resolvechoice4 = ResolveChoice.apply(
+    frame=resolvechoice3,
+    choice="make_struct",
+    transformation_ctx="resolvechoice4"
+    )
+
+# Dropping fields with NULL values
+results1 = DropNullFields.apply(
+    frame=resolvechoice4,
+    transformation_ctx="results1"
+    )
+
+# Renaming column from entry to age
+results2 = RenameField.apply(
+    frame=results1,
+    old_name="entry",
+    new_name="gender",
+    transformation_ctx="results2"
+    )
+
+# Selecting distinct values to put all data into a single file, 
+# We need to convert it to a data frame, repartition it, and write it out.
+results3 = results2.select_fields(
+    ['email', 'gender']).toDF().distinct().repartition(1)
 
 # Converting to a dynamic dataframe
-df_dyf = DynamicFrame.fromDF(
-    df_gender_unique, glueContext, "dynamic"
-    )
+df_dyf = DynamicFrame.fromDF(results3, glueContext, "dynamic")
 
 # Writing parquet format to load on Data Catalog
 glueContext.write_dynamic_frame.from_options(
