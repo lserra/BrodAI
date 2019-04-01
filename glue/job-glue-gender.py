@@ -36,16 +36,16 @@ df_gender = glueContext.create_dynamic_frame.from_catalog(
 
 # Lowering the case for columns to avoid Hive issues
 for col in df_gender.columns:
-    df_gender = df_gender.withColumnRenamed(col, col.lower())
+    df_gender = df_gender.withColumnRenamed(col, col.lower()).collect()
 
 # Dropping column
 df_gender.drop('sourceid')
 
 # Selecting distinct values
-df_gender_unique = df_gender.select('email', 'entry').distinct()
+df_gender_unique = df_gender.select('email', 'entry').distinct().collect()
 
 # Renaming column from entry to gender
-df_gender_unique.withColumnRenamed('entry', 'gender')
+df_gender_unique.withColumnRenamed('entry', 'gender').collect()
 
 # Converting to a dynamic dataframe
 df_dyf = DynamicFrame.fromDF(

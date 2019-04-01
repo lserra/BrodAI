@@ -36,16 +36,16 @@ df_age = glueContext.create_dynamic_frame.from_catalog(
 
 # Lowering the case for columns to avoid Hive issues
 for col in df_age.columns:
-    df_age = df_age.withColumnRenamed(col, col.lower())
+    df_age = df_age.withColumnRenamed(col, col.lower()).collect()
 
 # Dropping column
 df_age.drop('sourceid')
 
 # Selecting distinct values
-df_age_unique = df_age.select('email', 'entry').distinct()
+df_age_unique = df_age.select('email', 'entry').distinct().collect()
 
 # Renaming column from entry to age
-df_age_unique.withColumnRenamed('entry', 'age')
+df_age_unique.withColumnRenamed('entry', 'age').collect()
 
 # Converting to a dynamic dataframe
 df_dyf = DynamicFrame.fromDF(
