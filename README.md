@@ -19,8 +19,6 @@ Here are my suggestions to deal with this situation:
 
 ## DAS (Design Architecture Solution)
 
-![DAS](https://github.com/lserra/BrodAI/blob/master/DAS.png?raw=true)
-
 In general the solution will works this way:
 
 - Extract the metadata from all tables and exporting to a JSON file.
@@ -121,5 +119,3 @@ If the table property was not added when the table was created, we can add it us
 ## Tables found
 
 Has been found around 677 tables ('mdb_field_*').
-
-The complete list with all tables can be seen [here](/home/lserra/Downloads/Upwork/tables_found.csv).
