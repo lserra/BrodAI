@@ -33,16 +33,25 @@ WITH (
   format='PARQUET'
 ) AS
 SELECT 
-trim(lower(email)) as email, 
-trim(lower(entry)) as entry
+  trim(lower(email)) as email, 
+  trim(lower(entry)) as entry
 FROM "mm_redirect_logs"."mdb_field_gender"
 WHERE lower(entry) in ('m', 'f', 'u');
 ================================================================================
-SELECT entry, count(*) as QTY
+/*Recreating the Age table*/
+CREATE TABLE IF NOT EXISTS mm_redirect_logs.new_age
+WITH (
+  format='PARQUET'
+) AS
+SELECT
+  lower(email) as email, 
+  lpad(entry, 3, '0') as entry
+FROM "mm_redirect_logs"."mdb_field_age"
+WHERE 
+  entry NOT LIKE 'value%';
+================================================================================
+SELECT 
+  entry, count(*) as QTY
 FROM "mm_redirect_logs"."mdb_field_age"
 GROUP BY entry
-limit 100;
-================================================================================
-SELECT DISTINCT entry
-FROM "mm_redirect_logs"."mdb_field_age"
 limit 100;
