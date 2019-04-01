@@ -31,7 +31,7 @@ job.init(args['JOB_NAME'])
 # email, age
 df_gender = glueContext.create_dynamic_frame.from_catalog(
     database="mm_redirect_logs",
-    table_name="mdb_field_new_gender"
+    table_name="new_gender"
     ).toDF()
 
 # Lowering the case for columns to avoid Hive issues
