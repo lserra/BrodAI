@@ -1,9 +1,8 @@
 # ==============================================================================
 # BrodAI
 # Created by: Laercio Serra (laercio.serra@gmail.com)
-# Joining fields from many tables into only one table
-# Fields: email, age
-# Special Parameter: --enable-glue-datacatalog
+# Cleaning up table: Age
+# Moving the table to: 'mm_data_lake'
 # ==============================================================================
 import sys
 
@@ -35,19 +34,16 @@ df_age = glueContext.create_dynamic_frame.from_catalog(
     table_name="mdb_field_age"
     ).toDF()
 
-# For each dataframe
-# Lowering the case for columns
-# To avoid Hive issues
+# Lowering the case for columns to avoid Hive issues
 for col in df_age.columns:
     df_age = df_age.withColumnRenamed(col, col.lower())
 
-# Dropping columns duplicated: email
+# Dropping column
 df_age.drop('sourceid')
 
 # For each dataframe
 # Selecting distinct values [email]
-# df_age_unique = df_age.select('email', 'entry').distinct()
-df_age_unique = df_age.distinct()
+df_age_unique = df_age.select('email', 'entry').distinct()
 
 # Renaming column from entry to age
 df_age_unique.withColumnRenamed('entry', 'age')
