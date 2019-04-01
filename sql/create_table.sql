@@ -1,3 +1,4 @@
+/*Creating the test table*/
 CREATE EXTERNAL TABLE `test_laercio_serra`(
   -- `sourceid` bigint COMMENT '', 
   `email` string COMMENT '', 
@@ -14,3 +15,34 @@ LOCATION
   s3://mm-redirect-logs/warehouse/mm/masterdb/fields/test_laercio_serra
 TBLPROPERTIES (
   'has_encrypted_data'='false')
+================================================================================
+/*Recreating the Gender table*/
+CREATE TABLE IF NOT EXISTS mm_redirect_logs.new_gender
+WITH (
+  format='PARQUET'
+) AS
+SELECT 
+trim(replace(lower(email),'"', '')) as email, 
+trim(replace(lower(entry),'"', '')) as entry
+FROM "mm_redirect_logs"."mdb_field_gender"
+WHERE lower(entry) in ('"m"', '"f"', '"u"');
+================================================================================
+/*Recreating the Gender table*/
+CREATE TABLE IF NOT EXISTS mm_redirect_logs.new_gender
+WITH (
+  format='PARQUET'
+) AS
+SELECT 
+trim(lower(email)) as email, 
+trim(lower(entry)) as entry
+FROM "mm_redirect_logs"."mdb_field_gender"
+WHERE lower(entry) in ('m', 'f', 'u');
+================================================================================
+SELECT entry, count(*) as QTY
+FROM "mm_redirect_logs"."mdb_field_age"
+GROUP BY entry
+limit 100;
+================================================================================
+SELECT DISTINCT entry
+FROM "mm_redirect_logs"."mdb_field_age"
+limit 100;

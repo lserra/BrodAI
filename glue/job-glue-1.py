@@ -49,10 +49,10 @@ df_income = glueContext.create_dynamic_frame.from_catalog(
     table_name="mdb_field_income"
     ).toDF()
 
-df_gender = glueContext.create_dynamic_frame.from_catalog(
-    database="mm_redirect_logs",
-    table_name="mdb_field_gender"
-    ).toDF()
+# df_gender = glueContext.create_dynamic_frame.from_catalog(
+#     database="mm_redirect_logs",
+#     table_name="mdb_field_gender"
+#     ).toDF()
 
 # For each dataframe
 # Lowering the case for columns
@@ -68,8 +68,8 @@ for col in df_ethnic.columns:
 for col in df_income.columns:
     df_income = df_income.withColumnRenamed(col, col.lower())
 
-for col in df_gender.columns:
-    df_gender = df_gender.withColumnRenamed(col, col.lower())
+# for col in df_gender.columns:
+#     df_gender = df_gender.withColumnRenamed(col, col.lower())
 
 # For each dataframe
 # Selecting distinct values [email]
@@ -77,14 +77,17 @@ for col in df_gender.columns:
 df_age_unique = df_age.select('email').distinct()
 df_ethnic_unique = df_ethnic.select('email').distinct()
 df_income_unique = df_income.select('email').distinct()
-df_gender_unique = df_gender.select('email').distinct()
+# df_gender_unique = df_gender.select('email').distinct()
 
 # Joining all emails only one dataframe
+# df_email_union = df_age_unique.union(
+#         df_ethnic_unique.union(
+#             df_income_unique.union(
+#                 df_gender_unique
+#             )))
 df_email_union = df_age_unique.union(
         df_ethnic_unique.union(
-            df_income_unique.union(
-                df_gender_unique
-            )))
+            df_income_unique))
 
 # Selecting distinct values [email]
 df_email_union_unique = df_email_union.select('email').distinct()
@@ -132,12 +135,12 @@ df_joined_income = df_joined_ethnic.join(
 # df_joined_income.withColumnRenamed('entry', 'income')
 
 # Joining values: email, age, ethnic, income and gender
-df_joined_gender = df_joined_income.join(
-    df_gender, ['email'], 'left_outer'
-    ).select(
-        df_joined_income['email', 'age', 'ethnic', 'income'],
-        df_gender['entry'].alias('gender')
-        ).collect()
+# df_joined_gender = df_joined_income.join(
+#     df_gender, ['email'], 'left_outer'
+#     ).select(
+#         df_joined_income['email', 'age', 'ethnic', 'income'],
+#         df_gender['entry'].alias('gender')
+#         ).collect()
 
 # Dropping columns duplicated: email
 # df_joined_gender.drop('email')
@@ -146,8 +149,11 @@ df_joined_gender = df_joined_income.join(
 # df_joined_gender.withColumnRenamed('entry', 'gender')
 
 # Converting to a dynamic dataframe
+# df_dyf = DynamicFrame.fromDF(
+#     df_joined_gender, glueContext, "dynamic"
+#     )
 df_dyf = DynamicFrame.fromDF(
-    df_joined_gender, glueContext, "dynamic"
+    df_joined_income, glueContext, "dynamic"
     )
 
 # Writing parquet format to load on Data Catalog
