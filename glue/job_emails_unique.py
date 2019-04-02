@@ -14,10 +14,9 @@ from awsglue.dynamicframe import DynamicFrame
 from awsglue.job import Job
 from awsglue.transforms import *
 from awsglue.utils import getResolvedOptions
+
 from pyspark.context import SparkContext
 from pyspark.sql import SparkSession, SQLContext
-from pyspark.sql.functions import col, regexp_extract, regexp_replace, udf
-from pyspark.sql.types import StringType
 
 # Params to be trigged by lambda function
 args = getResolvedOptions(sys.argv, ['JOB_NAME'])
