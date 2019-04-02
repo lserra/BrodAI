@@ -70,8 +70,9 @@ df_email_union = df_age_unique.union(
                 df_gender_unique
             )))
 
-# Dropping values duplicated [email]
-df_email_union_unique = df_email_union.select('email').distinct()
+# Selecting distinct values to put all data into a single file,
+# We need to convert it to a data frame, repartition it, and write it out.
+df_email_union_unique = df_email_union.select('email').distinct().repartition(1)
 
 # Converting a Spark datfarame to DynamicFrame
 df_dyf = DynamicFrame.fromDF(
