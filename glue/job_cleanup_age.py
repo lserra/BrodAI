@@ -49,27 +49,13 @@ selectfields2 = SelectFields.apply(
     transformation_ctx="selectfields2"
     )
 
-resolvechoice3 = ResolveChoice.apply(
-    frame=selectfields2,
-    choice="MATCH_CATALOG",
-    database="mm_data_lake",
-    table_name="mdb_field_new_age",
-    transformation_ctx="resolvechoice3"
-    )
-
-resolvechoice4 = ResolveChoice.apply(
-    frame=resolvechoice3,
-    choice="make_struct",
-    transformation_ctx="resolvechoice4"
-    )
-
 # Dropping fields with NULL values
 results1 = DropNullFields.apply(
     frame=resolvechoice4,
     transformation_ctx="results1"
     )
 
-# Renaming column from entry to age
+# Renaming column
 results2 = RenameField.apply(
     frame=results1,
     old_name="entry",
@@ -77,7 +63,7 @@ results2 = RenameField.apply(
     transformation_ctx="results2"
     )
 
-# Selecting distinct values to put all data into a single file, 
+# Selecting distinct values to put all data into a single file,
 # We need to convert it to a data frame, repartition it, and write it out.
 results3 = results2.select_fields(
     ['email', 'age']).toDF().distinct().repartition(1)
