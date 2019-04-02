@@ -55,7 +55,7 @@ results1 = DropNullFields.apply(
     transformation_ctx="results1"
     )
 
-# Renaming column from entry to age
+# Renaming column
 results2 = RenameField.apply(
     frame=results1,
     old_name="entry",
