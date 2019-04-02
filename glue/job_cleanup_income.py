@@ -63,7 +63,7 @@ results2 = RenameField.apply(
     transformation_ctx="results2"
     )
 
-# Selecting distinct values to put all data into a single file, 
+# Selecting distinct values to put all data into a single file,
 # We need to convert it to a data frame, repartition it, and write it out.
 results3 = results2.select_fields(
     ['email', 'net_income']).toDF().distinct().repartition(1)
