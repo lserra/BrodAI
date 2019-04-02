@@ -3,6 +3,7 @@
 # Created by: Laercio Serra (laercio.serra@gmail.com)
 # Cleaning up table: Net_Income
 # Moving the table to: 'mm_data_lake'
+# Job parameter: --conf: spark.driver.maxResultSize=2G
 # ==============================================================================
 import sys
 

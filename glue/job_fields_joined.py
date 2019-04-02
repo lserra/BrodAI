@@ -3,7 +3,9 @@
 # Created by: Laercio Serra (laercio.serra@gmail.com)
 # Joining fields from many tables into only one table
 # Fields: email, gender, ethnic, age, income
-# Special Parameter: --enable-glue-datacatalog
+# Job parameters:
+# --conf: spark.driver.maxResultSize=2G
+# --enable-glue-datacatalog
 # ==============================================================================
 import sys
 
