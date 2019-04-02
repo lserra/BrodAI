@@ -48,20 +48,6 @@ selectfields2 = SelectFields.apply(
     transformation_ctx="selectfields2"
     )
 
-# resolvechoice3 = ResolveChoice.apply(
-#     frame=selectfields2,
-#     choice="MATCH_CATALOG",
-#     database="mm_data_lake",
-#     table_name="mdb_field_new_netincome",
-#     transformation_ctx="resolvechoice3"
-#     )
-
-# resolvechoice4 = ResolveChoice.apply(
-#     frame=resolvechoice3,
-#     choice="make_struct",
-#     transformation_ctx="resolvechoice4"
-#     )
-
 # Dropping fields with NULL values
 results1 = DropNullFields.apply(
     frame=selectfields2,
