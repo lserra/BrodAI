@@ -29,7 +29,7 @@ job = Job(glueContext)
 job.init(args['JOB_NAME'], args)
 
 # Loading a table from Glue data catalog
-# email, gender
+# email, net_income
 datasource0 = glueContext.create_dynamic_frame.from_catalog(
     database="mm_redirect_logs",
     table_name="new_netincome",
