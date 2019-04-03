@@ -1,8 +1,8 @@
 # ==============================================================================
 # BrodAI
 # Created by: Laercio Serra (laercio.serra@gmail.com)
-# Joining fields from many tables into only one table
-# Fields: email, gender, ethnic, age, income
+# Creating a table that contais all distinct emails (unique)
+# Fields: email
 # Job parameters:
 # --conf: spark.driver.maxResultSize=2G
 # --enable-glue-datacatalog
