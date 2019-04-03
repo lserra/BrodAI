@@ -18,8 +18,6 @@ from awsglue.utils import getResolvedOptions
 from pyspark.context import SparkContext
 from pyspark.sql import SparkSession, SQLContext
 from pyspark.sql import functions as F
-# from pyspark.sql.functions import col, regexp_extract, regexp_replace, udf
-# from pyspark.sql.types import StringType
 
 # Params to be trigged by lambda function
 args = getResolvedOptions(sys.argv, ['JOB_NAME'])
@@ -33,38 +31,38 @@ job = Job(glueContext)
 job.init(args['JOB_NAME'])
 
 # Loading the tables from Glue data catalog
-dyf_emails_unique = glueContext.create_dynamic_frame.from_catalog(
+dyf_fields_joined = glueContext.create_dynamic_frame.from_catalog(
     database="mm_data_lake",
-    table_name="mdb_field_emails_unique"
+    table_name="mdb_fields_joined"
     )
 
-dyf_net_income = glueContext.create_dynamic_frame.from_catalog(
+dyf_ethnicity = glueContext.create_dynamic_frame.from_catalog(
     database="mm_data_lake",
-    table_name="mdb_field_new_netincome"
+    table_name="mdb_field_new_ethnicity"
     )
 
 # Converting DynamicFrame to Spark dataframes
-df_emails_unique = dyf_emails_unique.toDF()
-df_net_income = dyf_net_income.toDF()
+df_fields_joined = dyf_fields_joined.toDF()
+df_ethnicity = dyf_ethnicity.toDF()
 
-# Removing values duplicated (email + net_income)
-# Grouping by email and returning the max net_income
-df_net_income_clean = df_net_income.groupby('email').agg(F.max('net_income').alias("net_income"))
+# Removing values duplicated (email + ethnicity)
+# Grouping by email and returning the max ethnicity
+df_ethnicity_clean = df_ethnicity.groupby('email').agg(F.max('ethnicity').alias("ethnicity"))
 
 # Joining fields: email, net_income
-df_joined = df_emails_unique.join(
-    df_net_income_clean, ['email'], 'inner'
+df_joined = df_fields_joined.join(
+    df_ethnicity_clean, ['email'], 'left_outer'
     ).select(
-        df_emails_unique['email'],
-        df_net_income_clean['net_income']
+        df_fields_joined['email'],
+        df_ethnicity_clean['ethnicity']
         )
 
 # We need to convert it to a dataframe, repartition it, and write it out.
-df_joined_net_income = df_joined.repartition(1)
+df_joined_ethnicity = df_joined.repartition(1)
 
 # Converting to a dynamic dataframe
 df_dyf = DynamicFrame.fromDF(
-    df_joined_net_income, glueContext, "dynamic"
+    df_joined_ethnicity, glueContext, "dynamic"
     )
 
 # Writing parquet format to load on Data Catalog
