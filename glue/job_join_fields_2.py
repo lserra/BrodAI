@@ -49,7 +49,7 @@ df_ethnicity = dyf_ethnicity.toDF()
 # Grouping by email and returning the max ethnicity
 df_ethnicity_clean = df_ethnicity.groupby('email').agg(F.max('ethnicity').alias("ethnicity"))
 
-# Joining fields: email, net_income
+# Joining fields: email, net_income, and ethnicity
 df_joined = df_fields_joined.join(
     df_ethnicity_clean, ['email'], 'left_outer'
     ).select(
