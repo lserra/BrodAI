@@ -50,13 +50,14 @@ df_ethnicity = dyf_ethnicity.toDF()
 df_ethnicity_clean = df_ethnicity.groupby('email').agg(F.max('ethnicity').alias("ethnicity"))
 
 # Joining fields: email, net_income, and ethnicity
+# Removing values duplicated
 df_joined = df_fields_joined.join(
     df_ethnicity_clean, ['email'], 'left_outer'
     ).select(
         df_fields_joined['email'],
         df_fields_joined['net_income'],
         df_ethnicity_clean['ethnicity']
-        )
+        ).distinct()
 
 # We need to convert it to a dataframe, repartition it, and write it out.
 df_joined_ethnicity = df_joined.repartition(1)
