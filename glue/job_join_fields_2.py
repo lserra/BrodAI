@@ -54,6 +54,7 @@ df_joined = df_fields_joined.join(
     df_ethnicity_clean, ['email'], 'left_outer'
     ).select(
         df_fields_joined['email'],
+        df_fields_joined['net_income'],
         df_ethnicity_clean['ethnicity']
         )
 
