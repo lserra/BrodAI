@@ -18,8 +18,6 @@ from awsglue.utils import getResolvedOptions
 from pyspark.context import SparkContext
 from pyspark.sql import SparkSession, SQLContext
 from pyspark.sql import functions as F
-# from pyspark.sql.functions import col, regexp_extract, regexp_replace, udf
-# from pyspark.sql.types import StringType
 
 # Params to be trigged by lambda function
 args = getResolvedOptions(sys.argv, ['JOB_NAME'])
@@ -53,7 +51,7 @@ df_net_income_clean = df_net_income.groupby('email').agg(F.max('net_income').ali
 
 # Joining fields: email, net_income
 df_joined = df_emails_unique.join(
-    df_net_income_clean, ['email'], 'inner'
+    df_net_income_clean, ['email'], 'left_outer'
     ).select(
         df_emails_unique['email'],
         df_net_income_clean['net_income']
