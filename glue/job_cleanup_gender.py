@@ -15,11 +15,12 @@ from awsglue.utils import getResolvedOptions
 
 from pyspark.context import SparkContext
 from pyspark.sql import SparkSession
+from pyspark.sql.functions import lower, trim
 
 # Params to be trigged by lambda function
 args = getResolvedOptions(sys.argv, ['JOB_NAME'])
 
-# Create a Glue context
+# Creating a Glue context
 sc = SparkContext()
 glueContext = GlueContext(sc)
 spark = glueContext.spark_session
@@ -30,46 +31,72 @@ job.init(args['JOB_NAME'], args)
 
 # Loading a table from Glue data catalog
 # email, gender
-datasource0 = glueContext.create_dynamic_frame.from_catalog(
+datasource = glueContext.create_dynamic_frame.from_catalog(
     database="mm_redirect_logs",
     table_name="new_gender",
-    transformation_ctx="datasource0")
+    transformation_ctx="datasource")
 
-applymapping1 = ApplyMapping.apply(
-    frame=datasource0,
+apply_mapping = ApplyMapping.apply(
+    frame=datasource,
     mappings=[
         ("email", "string", "email", "string"),
         ("entry", "string", "entry", "string")
         ],
-    transformation_ctx="applymapping1")
+    transformation_ctx="apply_mapping")
 
-selectfields2 = SelectFields.apply(
-    frame=applymapping1,
+# Creating a DynamicFrame dataframe
+select_fields = SelectFields.apply(
+    frame=apply_mapping,
     paths=["email", "entry"],
-    transformation_ctx="selectfields2"
+    transformation_ctx="select_fields"
+    )
+
+# Renaming column "entry" to "gender"
+rename_col = RenameField.apply(
+    frame=select_fields,
+    old_name="entry",
+    new_name="gender",
+    transformation_ctx="rename_col"
     )
 
 # Dropping fields with NULL values
-results1 = DropNullFields.apply(
-    frame=selectfields2,
-    transformation_ctx="results1"
+drop_null = DropNullFields.apply(
+    frame=rename_col,
+    transformation_ctx="drop_null"
     )
 
-# Renaming column
-results2 = RenameField.apply(
-    frame=results1,
-    old_name="entry",
-    new_name="gender",
-    transformation_ctx="results2"
+# Converting DynamicFrame to Spark dataframe
+dyf_df = drop_null.toDF()
+
+# Converting a string column to lower case.
+lower_cols = dyf_df.select(
+    lower(dyf_df['email']).alias('email'),
+    lower(dyf_df['gender']).alias('gender')
     )
 
-# Selecting distinct values to put all data into a single file, 
-# We need to convert it to a data frame, repartition it, and write it out.
-results3 = results2.select_fields(
-    ['email', 'gender']).toDF().distinct().repartition(1)
+# Trim the spaces from both ends for the specified string column
+trim_cols = lower_cols.select(
+    trim(lower_cols['email']).alias('email'),
+    trim(lower_cols['gender']).alias('gender')
+    )
 
-# Converting to a dynamic dataframe
-df_dyf = DynamicFrame.fromDF(results3, glueContext, "dynamic")
+# Replacing a value with another value
+# male = m / female = f
+mf_values = trim_cols.replace('male', 'm').replace('female', 'f')
+
+# Filtering rows where gender equal 'm' (male) or 'f' (female)
+# Use "|" instead of "or"
+# filter_rows = trim_cols.where(
+#     (trim_cols['gender'] == 'm') | (trim_cols['gender'] == 'f')
+#     )
+filter_rows = mf_values[mf_values['gender'].isin('m', 'f')]
+
+# Selecting distinct values to put all data into a single file,
+distinct_values = filter_rows.select(
+    ['email', 'gender']).distinct().repartition(1)
+
+# Converting Spark to DynamicFrame dataframe
+df_dyf = DynamicFrame.fromDF(distinct_values, glueContext, "dynamic")
 
 # Writing parquet format to load on Data Catalog
 glueContext.write_dynamic_frame.from_options(
