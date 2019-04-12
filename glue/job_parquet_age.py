@@ -29,12 +29,12 @@ job.init(args['JOB_NAME'], args)
 # ==============================================================================
 # Converting CSV file to Parquet file.
 # Database: mm_redirect_logs
-# Table Source: mdb_field_gender
-# Table Target: new_gender
+# Table Source: mdb_field_age
+# Table Target: new_age
 # ==============================================================================
 datasource = glueContext.create_dynamic_frame.from_catalog(
     database="mm_redirect_logs",
-    table_name="mdb_field_gender",
+    table_name="mdb_field_age",
     transformation_ctx="datasource")
 
 apply_mapping = ApplyMapping.apply(
@@ -64,7 +64,7 @@ glueContext.write_dynamic_frame.from_options(
         frame=df_dyf,
         connection_type="s3",
         connection_options={
-            "path": "s3://aws-athena-query-results-925821979506-us-east-1/Unsaved/gender/"
+            "path": "s3://aws-athena-query-results-925821979506-us-east-1/Unsaved/age/"
             },
         format="parquet"
         )
