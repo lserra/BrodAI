@@ -64,7 +64,7 @@ glueContext.write_dynamic_frame.from_options(
         frame=df_dyf,
         connection_type="s3",
         connection_options={
-            "path": "s3://aws-athena-query-results-925821979506-us-east-1/Unsaved/gender/"
+            "path": "s3://aws-glue-temporary-925821979506-us-east-1/mm_data_lake/data_raw/gender/"
             },
         format="parquet"
         )
