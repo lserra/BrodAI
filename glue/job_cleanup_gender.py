@@ -91,7 +91,7 @@ mf_values = trim_cols.replace('male', 'm').replace('female', 'f')
 #     )
 filter_rows = mf_values[mf_values['gender'].isin('m', 'f')]
 
-# Selecting distinct values to put all data into a single file,
+# Selecting distinct values to put all data into a single file
 distinct_values = filter_rows.select(
     ['email', 'gender']).distinct().repartition(1)
 
